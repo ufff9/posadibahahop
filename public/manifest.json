@@ -1,0 +1,24 @@
+{
+    "name": "Adibah shop",
+    "short_name": "Adibah shop",
+    "description": "Sistem kasir Adibah shop - Ritel modern",
+    "start_url": "/dashboard",
+    "display": "standalone",
+    "background_color": "#070220",
+    "theme_color": "#070220",
+    "orientation": "portrait-primary",
+    "icons": [
+        {
+            "src": "/icons/icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "/icons/icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any"
+        }
+    ]
+}
