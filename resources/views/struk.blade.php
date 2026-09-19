@@ -1,6 +1,50 @@
 <!DOCTYPE html>
 <html lang="id">
 
+@php
+$w = 32; // lebar karakter printer termal 58mm
+
+$tengah = function ($t) use ($w) {
+$t = substr($t, 0, $w);
+$kiri = max(0, intdiv($w - strlen($t), 2));
+return str_repeat(' ', $kiri) . $t;
+};
+
+$kiriKanan = function ($kiri, $kanan) use ($w) {
+$kanan = (string) $kanan;
+$sisa = max(1, $w - strlen($kanan));
+return substr(str_pad(substr($kiri, 0, $sisa), $sisa), 0, $sisa) . $kanan;
+};
+
+$b = [];
+$b[] = $tengah('ADIBAH SHOP');
+$b[] = $tengah('Ritel Modern');
+$b[] = $tengah('Jambi');
+$b[] = str_repeat('-', $w);
+$b[] = 'No : ' . $transaksi->kode;
+$b[] = 'Tgl : ' . $transaksi->created_at->format('d/m/y H:i');
+$b[] = 'Kasir: ' . $transaksi->user->name;
+$b[] = str_repeat('-', $w);
+foreach ($transaksi->detail as $item) {
+$b[] = substr($item->barang->nama ?? 'Barang', 0, $w);
+$b[] = $kiriKanan(' ' . $item->jumlah . ' x ' . number_format($item->harga, 0, ',', '.'),
+number_format($item->subtotal, 0, ',', '.'));
+}
+$b[] = str_repeat('-', $w);
+$b[] = $kiriKanan('TOTAL', 'Rp ' . number_format($transaksi->total, 0, ',', '.'));
+$b[] = $kiriKanan('Bayar', 'Rp ' . number_format($transaksi->bayar, 0, ',', '.'));
+$b[] = $kiriKanan('Kembali', 'Rp ' . number_format($transaksi->kembalian, 0, ',', '.'));
+$b[] = 'Metode: ' . strtoupper($transaksi->metode_bayar);
+$b[] = str_repeat('-', $w);
+$b[] = $tengah('Terima kasih');
+$b[] = $tengah('atas kunjungan Anda');
+$b[] = ' ';
+$b[] = ' ';
+
+$teksStruk = implode("\n", $b) . "\n";
+$linkRawbt = 'rawbt:' . rawurlencode($teksStruk);
+@endphp
+
 <head>
     <meta charset="utf-8">
     <title>Struk {{ $transaksi->kode }}</title>
@@ -81,6 +125,7 @@
             border-radius: 4px;
             cursor: pointer;
             font-size: 12px;
+            text-decoration: none;
         }
     </style>
 </head>
@@ -154,11 +199,18 @@
     </div>
 
     <div class="center no-print">
-        <button class="btn" onclick="window.print()">🖨️ Cetak</button>
+        <a class="btn" href="{{ $linkRawbt }}">🖨️ Cetak ke Printer</a>
+        <a class="btn" href="#" onclick="window.print(); return false;"
+            style="background:#6b7280;">Print biasa</a>
     </div>
 
     <script>
-        window.addEventListener('load', () => setTimeout(() => window.print(), 400));
+        // Otomatis kirim ke RawBT saat struk dibuka (di tablet Android dengan RawBT + printer terpasang)
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                window.location.href = "{{ $linkRawbt }}";
+            }, 500);
+        });
     </script>
 </body>
 
